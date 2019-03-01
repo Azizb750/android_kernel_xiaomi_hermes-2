@@ -55,8 +55,8 @@
 #include "disp_helper.h"
 #define ALIGN_TO(x, n)  \
 	(((x) + ((n) - 1)) & ~((n) - 1))
-	
-extern void lcm_power_off(void);
+
+
 extern unsigned int isAEEEnabled;
 
 struct notifier_block pm_nb;
@@ -2316,27 +2316,6 @@ EXPORT_SYMBOL(mtkfb_get_fb_size);
 #endif
 
 
-static int mtkfb_lcm_id_show(struct device *dev,struct device_attribute *attr,char *buf)	//Alvin
-{
-	printk("LCM_driver = %s\n",mtkfb_find_lcm_driver());
-	if(!strncmp("nt35532",mtkfb_find_lcm_driver(),7))
-			return snprintf(buf,PAGE_SIZE,"%s\n","5A");
-	else if(!strncmp("nt36760",mtkfb_find_lcm_driver(),7))
-			return snprintf(buf,PAGE_SIZE,"%s\n","E6");
-	else if(!strncmp("nt35596",mtkfb_find_lcm_driver(),7))
-			return snprintf(buf,PAGE_SIZE,"%s\n","5A");
-	else if(!strncmp("r69006",mtkfb_find_lcm_driver(),6))
-			return snprintf(buf,PAGE_SIZE,"%s\n","37");
-	else if(!strncmp("B2",mtkfb_find_lcm_driver(),2))
-			return snprintf(buf,PAGE_SIZE,"%s\n","B2");
-	else
-			return snprintf(buf,PAGE_SIZE,"%s\n","Unknown");
-}
-
-
-static DEVICE_ATTR(LCM_ID,0444,mtkfb_lcm_id_show,NULL);	//alvin
-
-
 static int mtkfb_probe(struct device *dev)
 {
 	struct mtkfb_device *fbdev = NULL;
@@ -2344,20 +2323,15 @@ static int mtkfb_probe(struct device *dev)
 	int init_state;
 	int r = 0;
 	char *p = NULL;
-	int ret = 0;
-	struct platform_device *pdev = to_platform_device(dev);		//Alvin
-
-	printk("mtkfb_probe\n");
-	if(get_boot_mode() == META_BOOT || get_boot_mode() == FACTORY_BOOT|| get_boot_mode() == ADVMETA_BOOT || get_boot_mode() == RECOVERY_BOOT)
+	DISPMSG("mtkfb_probe\n");
+	if (get_boot_mode() == META_BOOT || get_boot_mode() == FACTORY_BOOT || get_boot_mode() == ADVMETA_BOOT
+	    || get_boot_mode() == RECOVERY_BOOT)
 		first_update = false;
 
 	_parse_tag_videolfb();
 
 	init_state = 0;
 
-	ret = device_create_file(&pdev->dev,&dev_attr_LCM_ID);		//Alvin
-	if(ret)
-		printk("&pdev->dev add LCM_ID attribute fail!");
 
 	fbi = framebuffer_alloc(sizeof(struct mtkfb_device), dev);
 	if (!fbi) {
@@ -2528,7 +2502,6 @@ static void mtkfb_shutdown(struct device *pdev)
 		msleep(2 * 100000 / lcd_fps);	/* Delay 2 frames. */
 
 	if (primary_display_is_sleepd()) {
-		lcm_power_off();//temp solution for sharp nt35532 LCM display
 		MTKFB_LOG("mtkfb has been power off\n");
 		return;
 	}
@@ -2538,7 +2511,6 @@ static void mtkfb_shutdown(struct device *pdev)
 
 	primary_display_suspend();
 	MTKFB_LOG("[FB Driver] leave mtkfb_shutdown\n");
-	lcm_power_off();//temp solution for sharp nt35532 LCM display
 }
 
 void mtkfb_clear_lcm(void)
@@ -2572,7 +2544,7 @@ void mtkfb_clear_lcm(void)
 
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
-void mtkfb_early_suspend(struct early_suspend *h)
+static void mtkfb_early_suspend(struct early_suspend *h)
 {
 	int ret = 0;
 
@@ -2607,7 +2579,7 @@ static int mtkfb_resume(struct device *pdev)
 }
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
-void mtkfb_late_resume(struct early_suspend *h)
+static void mtkfb_late_resume(struct early_suspend *h)
 {
 	int ret = 0;
 

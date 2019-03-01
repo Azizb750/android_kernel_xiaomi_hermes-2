@@ -321,7 +321,6 @@ extern void lcm_power_off();
  */
 void emergency_restart(void)
 {
-    lcm_power_off();//temp solution for sharp nt35532 LCM display
 	kmsg_dump(KMSG_DUMP_EMERG);
 	machine_emergency_restart();
 }

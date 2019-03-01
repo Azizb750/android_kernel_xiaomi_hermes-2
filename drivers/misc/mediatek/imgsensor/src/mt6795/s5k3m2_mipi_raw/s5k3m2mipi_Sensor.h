@@ -127,6 +127,22 @@ typedef struct imgsensor_info_struct {
     kal_uint32  i2c_speed;     //i2c speed
 } imgsensor_info_struct;
 
+struct S5K3M2_MIPI_otp_struct
+{
+    kal_uint16 customer_id;
+	kal_uint16 module_integrator_id;
+	kal_uint16 lens_id;
+	kal_uint16 r_ratio;
+	kal_uint16 b_ratio;
+	kal_uint16 user_data[5];
+	kal_uint16 R_to_G;
+	kal_uint16 B_to_G;
+	kal_uint16 G_to_G;
+	kal_uint16 R_Gain;
+	kal_uint16 G_Gain;
+	kal_uint16 B_Gain;
+};
+
 /* SENSOR READ/WRITE ID */
 //#define IMGSENSOR_WRITE_ID_1 (0x6c)
 //#define IMGSENSOR_READ_ID_1  (0x6d)
@@ -136,5 +152,5 @@ typedef struct imgsensor_info_struct {
 extern int iReadRegI2C(u8 *a_pSendData , u16 a_sizeSendData, u8 * a_pRecvData, u16 a_sizeRecvData, u16 i2cId);
 extern int iWriteRegI2C(u8 *a_pSendData , u16 a_sizeSendData, u16 i2cId);
 extern void kdSetI2CSpeed(u16 i2cSpeed);
-
+extern bool read_3m2_eeprom( kal_uint16 addr, BYTE* data, kal_uint32 size);
 #endif 

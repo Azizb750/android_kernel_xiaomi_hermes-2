@@ -21,7 +21,6 @@ static ssize_t mtk_virtual_keys_show(struct kobject *kobj, struct kobj_attribute
 	return j;
 }
 
-#if 0
 static struct kobj_attribute mtk_virtual_keys_attr = {
 	.attr = {
 		 .name = "virtualkeys.mtk-tpd",
@@ -29,15 +28,6 @@ static struct kobj_attribute mtk_virtual_keys_attr = {
 		 },
 	.show = &mtk_virtual_keys_show,
 };
-#else
-static struct kobj_attribute mtk_virtual_keys_attr = {
-	.attr = {
-		 .name = "virtualkeys.synaptics_dsx_i2c",
-		 .mode = S_IRUGO,
-		 },
-	.show = &mtk_virtual_keys_show,
-};
-#endif
 
 static struct attribute *mtk_properties_attrs[] = {
 	&mtk_virtual_keys_attr.attr,

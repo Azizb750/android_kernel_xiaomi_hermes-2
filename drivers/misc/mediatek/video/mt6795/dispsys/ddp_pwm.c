@@ -413,7 +413,7 @@ int disp_pwm_set_backlight_cmdq(disp_pwm_id_t id, int level_1024, void *cmdq)
 			PWM_NOTICE("disp_pwm_set_backlight_cmdq(id = 0x%x, level_1024 = %d), old = %d", id, level_1024,
 				   old_pwm);
 		} else {
-			PWM_MSG("disp_pwm_set_backlight_cmdq(id = 0x%x, level_1024 = %d), old = %d", id, level_1024, old_pwm);
+			//disp_pwm_log(level_1024, MSG_LOG);
 		}
 
 		if (level_1024 > g_pwm_max_backlight[index]) {

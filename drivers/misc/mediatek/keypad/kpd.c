@@ -95,18 +95,6 @@ static struct platform_driver kpd_pdrv = {
 	},
 };
 
-
-
-//temp add for IGZO LCM panel
-static struct delayed_work lcm_susped_work;
-extern void lcm_power_off(void);
-extern int	checkAndRelease(void);
-static void lcm_irq_work(struct work_struct *work)
-{
-    lcm_power_off();
-    checkAndRelease();
-}
-
 /********************************************************************/
 static void kpd_memory_setting(void)
 {
@@ -362,41 +350,6 @@ void kpd_pwrkey_pmic_handler(unsigned long pressed)
 		kpd_print("KPD input device not ready\n");
 		return;
 	}
-    //temp add for IGZO LCM panel
-    if(pressed)
-    {
-	
-#ifdef KPD_PMIC_LPRST_TD
-	/* timeout period. 0: 7sec; 1: 11sec; 2: 14sec; 3: 5sec */
-	int rst_td = KPD_PMIC_LPRST_TD;
-
-	switch (rst_td) {
-
-	case 0:
-        	schedule_delayed_work(&lcm_susped_work, 77*HZ/10);
-		break;
-	case 1:
-        	schedule_delayed_work(&lcm_susped_work, 107*HZ/10);
-		break;
-	case 2:
-        	schedule_delayed_work(&lcm_susped_work, 137*HZ/10);
-		break;	
-	case 3:
-        	schedule_delayed_work(&lcm_susped_work, 47*HZ/10);
-		break;
-	default:
-        	schedule_delayed_work(&lcm_susped_work, 107*HZ/10);
-		break;
-	}
-#else
-
-#endif
-    }
-    else
-    {
-        cancel_delayed_work(&lcm_susped_work);
-    }
-
 	kpd_pmic_pwrkey_hal(pressed);
 }
 #endif
@@ -963,9 +916,6 @@ static int kpd_pdrv_probe(struct platform_device *pdev)
 	hrtimer_init(&aee_timer_5s, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	aee_timer_5s.function = aee_timer_5s_func;
 #endif
-    //temp add for IGZO LCM panel
-    INIT_DELAYED_WORK(&lcm_susped_work, lcm_irq_work);
-
 	err = kpd_create_attr(&kpd_pdrv.driver);
 	if (err) {
 		kpd_info("create attr file fail\n");

@@ -1,17 +1,17 @@
 #$(call all-subdir-src-or-makefile)
 include $(srctree)/drivers/misc/mediatek/Makefile.custom
 
-ifneq ($(PROJECT_X3_SUPPORT),yes)
-obj-y	+= hallsensor/
-endif
+#ifneq ($(PROJECT_X3_SUPPORT),yes)
+#obj-y	+= hallsensor/
+#endif
 
 ifeq ($(CONFIG_MTK_FINGERPRINT),y)
 obj-y   += fingerprint/
 endif
 
-ifeq ($(PROJECT_X3_SUPPORT),yes)
-    KBUILD_CFLAGS += -DPROJECT_X3_SUPPORT
-endif
+#ifeq ($(PROJECT_X3_SUPPORT),yes)
+#    KBUILD_CFLAGS += -DPROJECT_X3_SUPPORT
+#endif
   
 # For MT6795 FPGA bring-up
 ifeq ($(CONFIG_ARCH_MT6795),y)
@@ -41,7 +41,7 @@ ifneq ($(CONFIG_MTK_GIC),y)
 obj-y   += irq/
 endif
 
-obj-$(CONFIG_MTK_CPU_STRESS)	+= cpu_stress/
+#obj-$(CONFIG_MTK_CPU_STRESS)	+= cpu_stress/
 obj-$(CONFIG_MTK_LASTPC)	    += lastpc/
 obj-$(CONFIG_MTK_DBG_DUMP) += dbg_dump/
 
@@ -148,7 +148,7 @@ obj-$(CONFIG_MTK_CCCI_DRIVER)  +=  ccci/
 obj-$(CONFIG_MTK_CCCI_EXT)     +=  dual_ccci/
 obj-$(CONFIG_MTK_ECCCI_DRIVER) +=  eccci/
 obj-$(CONFIG_MTK_EEMCS_DRIVER) +=  eemcs/
-obj-$(CONFIG_MTK_IRTX_SUPPORT) += irtx/
+obj-$(CONFIG_MTK_CONSUMERIR_SUPPORT) += consumerir/
 obj-$(CONFIG_MTK_NFC) += nfc/
 obj-$(CONFIG_ZRAM)	+= mlog/
 
@@ -245,7 +245,7 @@ obj-$(CONFIG_SECURITY_SELINUX)	+= selinux_warning/
 # MTK PASR SW flow
 obj-$(CONFIG_MTKPASR)	+= mtkpasr/
 
-obj-$(CONFIG_MTK_TC1_FEATURE)	+= tc1_interface/
+#obj-$(CONFIG_MTK_TC1_FEATURE)	+= tc1_interface/
 
 obj-$(CONFIG_MTK_SWITCH_TX_POWER) += sw_tx_power/
 

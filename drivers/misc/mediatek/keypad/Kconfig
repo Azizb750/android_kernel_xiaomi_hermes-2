@@ -5,10 +5,6 @@ config MTK_KEYPAD
 	  To compile this driver as a module, choose M here: the
 	  module will be called mtk-kpd.
 
-config MUTE_KEY
-	bool "Mute key for support Letv 1 phone"
-	default n
-
 config KEYBOARD_HID
 	tristate "MediaTek hid keyboard support"
 	---help---

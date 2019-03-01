@@ -561,50 +561,6 @@ static long flashlight_ioctl_core(struct file *file, unsigned int cmd, unsigned 
 				}
 			}
 		break;
-    	case FLASH_IOC_GET_FLASH_DUTY:
-			{			
-				FLASHLIGHT_FUNCTION_STRUCT *pF;
-				pF = g_pFlashInitFunc[sensorDevIndex][strobeIndex][partIndex];
-				if(pF!=0)
-				{
-					i4RetValue = pF->flashlight_ioctl(cmd,kdArg.arg);
-		            		logI("FLASH_IOC_GET_FLASH_DUTY duty = %d",i4RetValue);
-		            		kdArg.arg = i4RetValue;
-		            		if(copy_to_user((void __user *) arg , (void*)&kdArg , sizeof(kdStrobeDrvArg)))
-					{
-						logI("[FLASH_IOC_IS_CHARGER_IN] ioctl copy to user failed ~");
-						return -EFAULT;
-					}
-				}
-				else
-				{
-					logI("[FLASH_IOC_IS_CHARGER_IN] function pointer is wrong ~");
-				}
-			}
-    	    break;
-			
-    	case FLASH_IOC_GET_FLASH_ONOFF_STATUS:
-			{
-				FLASHLIGHT_FUNCTION_STRUCT *pF;
-				pF = g_pFlashInitFunc[sensorDevIndex][strobeIndex][partIndex];
-				if(pF!=0)
-				{
-					i4RetValue = pF->flashlight_ioctl(cmd,kdArg.arg);
-		           		logI("FLASH_IOC_GET_FLASH_ONOFF_STATUS on = %d",i4RetValue);
-		            		kdArg.arg = i4RetValue;
-		            		if(copy_to_user((void __user *) arg , (void*)&kdArg , sizeof(kdStrobeDrvArg)))
-					{
-						logI("[FLASH_IOC_GET_FLASH_ONOFF_STATUS] ioctl copy to user failed ~");
-						return -EFAULT;
-					}
-				}
-				else
-				{
-					logI("[FLASH_IOC_GET_FLASH_ONOFF_STATUS] function pointer is wrong ~");
-				}
-			}
-				
-    	    break;
 		default :
 			{
 				FLASHLIGHT_FUNCTION_STRUCT *pF;
@@ -706,7 +662,6 @@ static long my_ioctl_compat(struct file *filep, unsigned int cmd, unsigned long 
 }
 #endif
 
-static int flash_open_count = 0;
 
 static int flashlight_open(struct inode *inode, struct file *file)
 {
@@ -718,9 +673,6 @@ static int flashlight_open(struct inode *inode, struct file *file)
 		bInited=1;
 	}
     logI("[flashlight_open] E ~");
-	
-	flash_open_count++;
-	
     return i4RetValue;
 }
 
@@ -728,18 +680,8 @@ static int flashlight_release(struct inode *inode, struct file *file)
 {
     logI("[flashlight_release] E ~");
 
-	if(flash_open_count <= 0)
-	{
-	    logI("[flashlight_release] flash_open_count <= 0 ~");
-	    return 0;
-	}
-	
-	if(flash_open_count == 1)
-	{
-		checkAndRelease();
-	}
+	checkAndRelease();
 
-	flash_open_count--;
     return 0;
 }
 
@@ -872,17 +814,11 @@ static int flashlight_remove(struct platform_device *dev)
     return 0;
 }
 
-static void flashlight_shutdown(struct platform_device * d)
-{
-   	checkAndRelease();
-
-}
 
 static struct platform_driver flashlight_platform_driver =
 {
     .probe      = flashlight_probe,
     .remove     = flashlight_remove,
-    .shutdown   = flashlight_shutdown,
     .driver     = {
         .name = FLASHLIGHT_DEVNAME,
 		.owner	= THIS_MODULE,

@@ -3,7 +3,7 @@
 
 #include <linux/types.h>
 
-#define C_CUST_ALS_LEVEL    16
+#define C_CUST_ALS_LEVEL    18
 #define C_CUST_I2C_ADDR_NUM 4
 
 #define MAX_THRESHOLD_HIGH 0xffff
@@ -16,7 +16,6 @@ struct alsps_hw {
 	int polling_mode;                               /*!< 1: polling mode ; 0:interrupt mode*/
 	int polling_mode_ps;                               /*!< 1: polling mode ; 0:interrupt mode*/
 	int polling_mode_als;                               /*!< 1: polling mode ; 0:interrupt mode*/
-	int polling_mode_gesture;
     unsigned char   i2c_addr[C_CUST_I2C_ADDR_NUM];  /*!< i2c address list, some chip will have multiple address */
     unsigned int    als_level[C_CUST_ALS_LEVEL-1];  /*!< (C_CUST_ALS_LEVEL-1) levels divides all range into C_CUST_ALS_LEVEL levels*/
     unsigned int    als_value[C_CUST_ALS_LEVEL];    /*!< the value reported in each level */
@@ -35,6 +34,11 @@ struct alsps_hw {
     int power_lp_mode_ctrl;                                 /*!< 1: disable ldo low power mode when p sensor enabled ; 0: no action*/
     bool is_batch_supported_ps;
     bool is_batch_supported_als;
+    unsigned int state_val;   /* disable all */
+    unsigned int psctrl_val;  /* ps_persistance=1, ps_gain=64X, PS_IT=0.391ms */
+    unsigned int alsctrl_val; /* als_persistance=1, als_gain=16X, ALS_IT=200ms */
+    unsigned int ledctrl_val; /* 100mA IRDR, 64/64 LED duty */
+    unsigned int wait_val;    /* 50 ms */
 };
 
 extern struct alsps_hw* get_cust_alsps_hw(void);

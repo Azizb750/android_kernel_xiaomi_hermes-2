@@ -29,8 +29,7 @@ int als_data_report(struct input_dev *dev, int value, int status)
 
 int ps_data_report(struct input_dev *dev, int value,int status)
 {
-	if(value != 5 && status != 2)
-		printk("+ps_data_report! %d, %d\n",value,status);
+	//ALSPS_LOG("+ps_data_report! %d, %d\n",value,status);
 	input_report_rel(dev, EVENT_TYPE_PS_VALUE, (value+1));
 	input_report_rel(dev, EVENT_TYPE_PS_STATUS, status);
 	input_sync(dev); 
@@ -805,7 +804,7 @@ static int alsps_real_driver_init(void)
 	return err;
 }
 
-int alsps_driver_add(struct alsps_init_info* obj) 
+  int alsps_driver_add(struct alsps_init_info* obj) 
 {
     int err=0;
 	int i =0;
@@ -848,7 +847,7 @@ int ps_report_interrupt_data(int value)
 	struct alsps_context *cxt = NULL;
 	//int err =0;
 	cxt = alsps_context_obj;	
-	printk("ps_report_interrupt_data value=%d, cxt->is_get_valid_ps_data_after_enable = %d\n",value,cxt->is_get_valid_ps_data_after_enable);
+
     if (cxt->is_get_valid_ps_data_after_enable == false)
     {
         if(ALSPS_INVALID_VALUE != value)
@@ -860,7 +859,7 @@ int ps_report_interrupt_data(int value)
             cancel_work_sync(&cxt->report_ps);
         }
     }
-	printk("cxt->is_ps_batch_enable = %d\n",cxt->is_ps_batch_enable);
+
     if (cxt->is_ps_batch_enable == false)
         ps_data_report(cxt->idev,value,3);
 	

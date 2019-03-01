@@ -46,8 +46,6 @@
 	#define PK_DBG(a,...)
 #endif
 
-#define FLASH_GPIO_EN GPIO15
-
 /******************************************************************************
  * local variables
 ******************************************************************************/
@@ -60,20 +58,16 @@ Functions
 *****************************************************************************/
 static void work_timeOutFunc(struct work_struct *data);
 
-extern int flashEnable_LM3560_2(void);
+//extern int flashEnable_sky81296_2();
+//extern int flashDisable_sky81296_2();
+//extern int setDuty_sky81296_2(int duty);
+//int init_sky81296();
 
-extern int flashDisable_LM3560_2(void);
 
-extern int setDuty_LM3560_2(int duty);
-
-extern int init_LM3560();
-
-extern int m_duty2;
-extern int LED2CloseFlag;
 
 static int FL_Enable(void)
 {
-    flashEnable_LM3560_2();
+//    flashEnable_sky81296_1();
     PK_DBG("FL_Enable-");
 
     return 0;
@@ -81,14 +75,14 @@ static int FL_Enable(void)
 
 static int FL_Disable(void)
 {
-    flashDisable_LM3560_2();
+  //  flashDisable_sky81296_1();
 
     return 0;
 }
 
 static int FL_dim_duty(kal_uint32 duty)
 {
-    setDuty_LM3560_2(duty);
+    //setDuty_sky81296_1(duty);
     return 0;
 }
 
@@ -102,9 +96,6 @@ static void lowPowerCB(LOW_BATTERY_LEVEL lev)
 static int FL_Init(void)
 {
     PK_DBG(" FL_Init line=%d\n",__LINE__);
-
-	init_LM3560();
-		
     INIT_WORK(&workTimeOut, work_timeOutFunc);
   //  register_low_battery_callback(&lowPowerCB, LOW_BATTERY_PRIO_FLASHLIGHT);
    // register_low_battery_notify(&lowPowerCB, LOW_BATTERY_PRIO_FLASHLIGHT);
@@ -116,8 +107,6 @@ static int FL_Init(void)
 static int FL_Uninit(void)
 {
 	FL_Disable();
-	mt_set_gpio_out(FLASH_GPIO_EN,GPIO_OUT_ZERO);
-    PK_DBG(" FL_UnInit line=%d\n",__LINE__);
     return 0;
 }
 
@@ -202,7 +191,7 @@ static int constant_flashlight_ioctl(unsigned int cmd, unsigned long arg)
 	ior_shift = cmd - (_IOR(FLASHLIGHT_MAGIC,0, int));
 	iow_shift = cmd - (_IOW(FLASHLIGHT_MAGIC,0, int));
 	iowr_shift = cmd - (_IOWR(FLASHLIGHT_MAGIC,0, int));
-	PK_DBG("constant_flashlight_ioctl() line=%d ior_shift=%d, iow_shift=%d iowr_shift=%d arg=%d\n",__LINE__, ior_shift, iow_shift, iowr_shift, arg);
+	PK_DBG("constant_flashlight_ioctl() line=%d ior_shift=%d, iow_shift=%d iowr_shift=%d arg=%d\n",__LINE__, ior_shift, iow_shift, iowr_shift, (int)arg);
     switch(cmd)
     {
 
@@ -214,8 +203,7 @@ static int constant_flashlight_ioctl(unsigned int cmd, unsigned long arg)
 
     	case FLASH_IOC_SET_DUTY :
     		PK_DBG("FLASHLIGHT_DUTY: %d\n",(int)arg);
-    		//FL_dim_duty(arg);
-    		m_duty2 = arg;
+    		FL_dim_duty(arg);
     		break;
 
 
@@ -234,14 +222,10 @@ static int constant_flashlight_ioctl(unsigned int cmd, unsigned long arg)
 					ktime = ktime_set( 0, g_timeOutTimeMs*1000000 );
 					hrtimer_start( &g_timeOutTimer, ktime, HRTIMER_MODE_REL );
 	            }
-				LED2CloseFlag = 0;
-				FL_dim_duty(m_duty2);
     			FL_Enable();
     		}
     		else
     		{
-    			LED2CloseFlag = 1;
-				FL_dim_duty(m_duty2);
     			FL_Disable();
 				hrtimer_cancel( &g_timeOutTimer );
     		}
@@ -296,31 +280,7 @@ static int constant_flashlight_ioctl(unsigned int cmd, unsigned long arg)
     	case FLASH_IOC_LOW_POWER_DETECT_END:
     		i4RetValue = detLowPowerEnd();
     		break;
-			
-    	case FLASH_IOC_GET_FLASH_DUTY:
 
-			if(LED2CloseFlag == 1)
-			{
-	    		i4RetValue = -1;
-			}
-			else
-			{
-	    		i4RetValue = m_duty2;
-			}
-    	    break;
-			
-    	case FLASH_IOC_GET_FLASH_ONOFF_STATUS:
-			
-			if(LED2CloseFlag == 1)
-			{
-	    		i4RetValue = 0;
-			}
-			else
-			{
-	    		i4RetValue = 1;
-			}
-    		break;
-			
         default :
     		PK_DBG(" No such command \n");
     		i4RetValue = -EPERM;
