@@ -872,6 +872,7 @@ static int kpd_pdrv_probe(struct platform_device *pdev)
 #ifdef KPD_PMIC_RSTKEY_MAP
 	__set_bit(KPD_PMIC_RSTKEY_MAP, kpd_input_dev->keybit);
 #endif
+#endif
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
 #ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	sweep2wake_setdev(kpd_input_dev);
